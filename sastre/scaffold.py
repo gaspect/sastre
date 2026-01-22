@@ -38,7 +38,6 @@ import "./style.css";
 <head>
     <meta charset="UTF-8" />
     <title>{title ?? "Ejemplo"}</title>
-    <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
     <h1>{title ?? "Ejemplo"}</h1>
@@ -134,13 +133,9 @@ class Scaffold:
         subprocess.run(["npm", "install", "-g", "pnpm"], cwd=self._path, check=True, shell=True)
         subprocess.run(["pnpm", "install"], cwd=self._path, check=True, shell=True)
 
-    def build(self):
-        subprocess.run(["pnpm", "run", "build"], cwd=self._path, check=True, shell=True)
-
     def project(self):
         self.dirs()
         self.files()
         print(f"🚀 Astro project created in {self._path}")
         self.install()
-        self.build()
         print("😎 Dependencias instaladas")

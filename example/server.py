@@ -6,7 +6,7 @@ from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 from sastre import Renderer
 
-ASTRO_PROJECT_DIR = Path("../ui").resolve()
+ASTRO_PROJECT_DIR = Path("./ui").resolve()
 
 renderer = Renderer(_dir=str(ASTRO_PROJECT_DIR))
 
@@ -31,7 +31,7 @@ def render(view, model):
 @app.get("/render/{view}", response_class=HTMLResponse)
 def api(view: str):
     try:
-        return render(view, {'name': 'Mónica' })
+        return render(view, {'title': 'Test Page' })
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail=str(e))
