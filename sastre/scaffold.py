@@ -37,11 +37,11 @@ import "./style.css";
 <html lang="es">
 <head>
     <meta charset="UTF-8" />
-    <title>{title ?? "Ejemplo"}</title>
+    <title>{title ?? "Sastre"}</title>
 </head>
 <body>
-    <h1>{title ?? "Ejemplo"}</h1>
-    <p>Este es un template vacío listo para agregar React, Vue o Tailwind.</p>
+    <h1>{title ?? "Sastre"}</h1>
+    <p>Let's stitch this together</p>
 </body>
 </html>
 """
@@ -74,7 +74,7 @@ if (Astro.request.method === 'POST') {
 const { view, model } = payload;
 
 if (!view) {
-  throw new Error('Falta "view" en el body JSON');
+  throw new Error('Missing "view" in the JSON body');
 }
 
 const viewModules = import.meta.glob('../views/*/index.astro');
@@ -94,7 +94,7 @@ if (typeof model === 'string') {
   try {
     props = JSON.parse(model);
   } catch {
-    throw new Error('El campo "model" debe ser un objeto JSON o un string JSON válido');
+    throw new Error('The model field must be a valid JSON string or an object');
   }
 }
 ---
@@ -138,4 +138,4 @@ class Scaffold:
         self.files()
         print(f"🚀 Astro project created in {self._path}")
         self.install()
-        print("😎 Dependencias instaladas")
+        print("😎 Installed dependencies")

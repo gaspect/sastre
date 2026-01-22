@@ -1,7 +1,6 @@
 from pathlib import Path
 import subprocess
 import requests
-import threading
 
 
 class Renderer:
@@ -11,7 +10,6 @@ class Renderer:
         self._server_process = None
 
     def start(self):
-        """Inicia Astro SSR como servicio persistente."""
         if self._server_process:
             return
 
@@ -35,11 +33,8 @@ class Renderer:
                 self._server_process.kill()
             self._server_process = None
 
-
     def __aenter__(self):
         self.start()
-        if self._watch:
-            self.watch()
         return self
 
     def __aexit__(self, exc_type, exc_val, exc_tb):
@@ -51,3 +46,15 @@ class Renderer:
         response = requests.post(url, json=payload)
         response.raise_for_status()
         return response.content
+
+    @property
+    def assets(self):
+        return self._dir / "public"
+
+    @property
+    def client(self):
+        return self._dir / "dist/client"
+
+
+    def __call__(self, view: str, model: dict) -> str:
+        return self.render(view, model)

@@ -6,9 +6,7 @@ from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 from sastre import Renderer
 
-ASTRO_PROJECT_DIR = Path("./ui").resolve()
-
-renderer = Renderer(_dir=str(ASTRO_PROJECT_DIR))
+renderer = Renderer(_dir=str(Path("./ui").resolve()))
 
 
 @asynccontextmanager
@@ -21,20 +19,13 @@ async def lifespan(_: FastAPI):
 app = FastAPI(title="Astro Renderer API", lifespan=lifespan)
 
 
-# Instancia global del Renderer
-
-
-def render(view, model):
-    return HTMLResponse(content=renderer.render(view, model))
-
-
 @app.get("/render/{view}", response_class=HTMLResponse)
 def api(view: str):
     try:
-        return render(view, {'title': 'Test Page' })
+        return HTMLResponse(content=renderer(view, {'title': 'Test Page'}))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# Monta assets estáticos (public/) en /assets
-app.mount("/assets", StaticFiles(directory=ASTRO_PROJECT_DIR / "public"), name="assets")
-app.mount("/", StaticFiles(directory=ASTRO_PROJECT_DIR / "dist/client"), name="client")
+
+app.mount("/assets", StaticFiles(directory=renderer.assets), name="assets")
+app.mount("/", StaticFiles(directory=renderer.client), name="client")
