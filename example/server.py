@@ -33,7 +33,6 @@ def api(view: str):
     try:
         return render(view, {'title': 'Test Page' })
     except Exception as e:
-        print(e)
         raise HTTPException(status_code=500, detail=str(e))
 
 # Monta assets estáticos (public/) en /assets
