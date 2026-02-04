@@ -11,6 +11,7 @@
 - 🏗️ **Instant Scaffolding**: Create a pre-configured Astro project optimized for SSR with a single command.
 - 🚀 **Seamless Rendering**: Render Astro views from Python using a simple API.
 - 🔄 **Dynamic Data**: Pass Python dictionaries as models to your Astro components.
+- ⚡ **HTMX Ready**: Easily render HTML fragments for dynamic server-side updates.
 - 🛠️ **FastAPI Integration**: Easily integrate with FastAPI or any other Python web framework.
 
 ## 📦 Installation
@@ -111,6 +112,35 @@ app.mount("/", StaticFiles(directory=renderer.client), name="client")
 
 ```
 
+## ⚡ HTMX Integration
+
+Sastre makes it easy to build dynamic UIs with HTMX by rendering Astro components as HTML fragments.
+
+```python
+from sastre import Renderer, Htmx, HtmxHelper
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
+
+renderer = Renderer(_dir="./ui")
+
+# 1. Apply the HTMX extension to set up dependencies and examples
+renderer.extension(Htmx())
+
+# 2. Use the HtmxHelper for rendering and triggers
+htmx = HtmxHelper(renderer)
+
+app = FastAPI()
+
+
+@app.post("/increment", response_class=HTMLResponse)
+async def increment(request: Request):
+    model = await request.json()
+    # Render a specific fragment (e.g., src/views/fragments/counter.astro)
+    content = htmx.render("fragments/counter.astro", model)
+
+    # Optional: use HTMX triggers
+    headers = htmx.trigger({}, "item-updated", {"id": 1})
+    return HTMLResponse(content=content, headers=headers)
 ```
 
 ## 🧩 Pluggable Extensions
