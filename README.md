@@ -196,7 +196,7 @@ class TailwindExtension(BaseExtension):
 
 
 # Apply it
-renderer._apply_extension(TailwindExtension())
+renderer.extension(TailwindExtension())
 ```
 
 ### 🔢 Dynamic Pagination Example
