@@ -11,7 +11,7 @@ renderer = Renderer(_dir=str(Path("./ui").resolve()))
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    renderer.start()
+    renderer.start(build=False) # Skip build if already built
     yield
     renderer.stop()
 
@@ -20,7 +20,14 @@ app = FastAPI(title="Astro Renderer API", lifespan=lifespan)
 
 
 @app.get("/render/{view}", response_class=HTMLResponse)
-def api(view: str):
+async def api(view: str):
+    try:
+        import asyncio
+        loop = asyncio.get_running_loop()
+        content = await loop.run_in_executor(None, renderer, view, {'title': 'Sastre + HTMX'})
+        return HTMLResponse(content=content)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
     try:
         return HTMLResponse(content=renderer(view, {'title': 'Test Page'}))
     except Exception as e:

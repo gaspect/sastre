@@ -42,13 +42,15 @@ This will create a directory named `my-ui-project` with the following structure:
 
 You can use the `Renderer` class to start the Astro server and render components.
 
+**Note**: If the directory provided to `Renderer` doesn't exist or is empty, Sastre will automatically scaffold a base Astro project for you.
+
 ```python
 from sastre import Renderer
 
 # Point to your Astro project directory
 renderer = Renderer(_dir="./my-ui-project")
 
-# Start the Astro SSR server
+# Start the Astro SSR server (performs 'pnpm run build' by default)
 renderer.start()
 
 # Render a view ('example' refers to src/views/example/index.astro)
@@ -61,6 +63,13 @@ print(html_content)
 
 # Don't forget to stop the server when done
 renderer.stop()
+```
+
+The `Renderer` also supports context managers:
+
+```python
+with Renderer(_dir="./my-ui-project") as renderer:
+    html = renderer("example", {"title": "Fast!"})
 ```
 
 ### 3. FastAPI Example
@@ -79,16 +88,21 @@ renderer = Renderer(_dir=str(Path("./ui").resolve()))
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    renderer.start()
+    # build=False skips the slow build step if you've already built the project
+    renderer.start(build=False)
     yield
     renderer.stop()
 
 app = FastAPI(title="Astro Renderer API", lifespan=lifespan)
 
 @app.get("/render/{view}", response_class=HTMLResponse)
-def api(view: str):
+async def api(view: str):
     try:
-        return HTMLResponse(content=renderer(view, {'title': 'Test Page'}))
+        import asyncio
+        loop = asyncio.get_running_loop()
+        # renderer is sync, so we run it in an executor to avoid blocking the loop
+        content = await loop.run_in_executor(None, renderer, view, {'title': 'Test Page'})
+        return HTMLResponse(content=content)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
