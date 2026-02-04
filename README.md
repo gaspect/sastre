@@ -97,6 +97,97 @@ app.mount("/", StaticFiles(directory=renderer.client), name="client")
 
 ```
 
+```
+
+## 🧩 Pluggable Extensions
+
+Sastre's architecture is built on a flexible extension system managed by `ExtensionManager` (automatically used by `Renderer`). You can create your own extensions or use the built-in ones.
+
+### Built-in Extensions
+
+- **HTMX**: `Htmx()` - Sets up HTMX dependencies and example fragments.
+- **Tailwind**: `Tailwind()` - Integrates Tailwind CSS v4.
+- **Alpine**: `Alpine()` - Adds Alpine.js integration.
+- **React**: `React()` - Adds React integration.
+- **Svelte**: `Svelte()` - Adds Svelte integration.
+- **Vue**: `Vue()` - Adds Vue integration.
+- **Lucide**: `Lucide()` - Adds `lucide-astro` for icons.
+
+### Using Multiple Extensions
+
+Sastre is designed to be elastic. You can apply multiple extensions to the same project.
+
+```python
+from sastre import Renderer, Tailwind, Vue, Htmx
+
+renderer = Renderer(_dir="./ui")
+
+# Apply multiple extensions
+renderer.extension(Tailwind())
+renderer.extension(Vue())
+renderer.extension(Htmx())
+```
+
+### Creating a Custom Extension
+
+```python
+from sastre import BaseExtension
+from pathlib import Path
+
+
+class TailwindExtension(BaseExtension):
+    def name(self):
+        return "Tailwind"
+
+    def dev_dependencies(self):
+        return {
+            "tailwindcss": "^3.4.1",
+            "@astrojs/tailwind": "^5.1.0"
+        }
+
+    def setup(self, project_dir: Path):
+        # Add tailwind config or modify astro.config.mjs here
+        config_path = project_dir / "tailwind.config.mjs"
+        config_path.write_text("export default { ... }")
+
+
+# Apply it
+renderer._apply_extension(TailwindExtension())
+```
+
+### 🔢 Dynamic Pagination Example
+
+You can implement dynamic pagination by combining HTMX with Astro fragments.
+
+**1. Create a fragment (`src/views/fragments/list.astro`):**
+```astro
+---
+const { items, page, totalPages } = Astro.props;
+---
+<div id="list-container">
+  <ul>
+    {items.map(item => <li>{item}</li>)}
+  </ul>
+  <button hx-post="/list" hx-vals={`{"page": ${page + 1}}`} hx-target="#list-container" hx-swap="outerHTML">
+    Next Page
+  </button>
+</div>
+```
+
+**2. Handle it in Python:**
+```python
+@app.post("/list")
+async def get_list(request: Request):
+    data = await request.json()
+    page = data.get("page", 1)
+    # ... logic to fetch your items for the page ...
+    return HTMLResponse(htmx.render("fragments/list.astro", {
+        "items": items,
+        "page": page,
+        "totalPages": 10
+    }))
+```
+
 ## 🛠️ How it Works
 
 Sastre sets up an Astro project with an adapter (Node.js) in standalone mode. It includes a special `render.astro` page that accepts `POST` requests. When you call `renderer.render()` in Python, it sends a JSON payload to this page, which dynamically imports the requested view and renders it with the provided model.
