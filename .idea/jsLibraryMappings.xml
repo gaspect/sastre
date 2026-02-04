@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="JavaScriptLibraryMappings">
-    <excludedPredefinedLibrary name="Sastre/test_refactor_ui/node_modules" />
+    <excludedPredefinedLibrary name="Sastre/test_htmx_bundle/node_modules" />
   </component>
 </project>

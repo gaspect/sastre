@@ -47,13 +47,10 @@ class Htmx(BaseExtension):
         ]
 
     def dependencies(self) -> Dict[str, str]:
-        return {}
+        return {"htmx.org": "^2.0.4"}
 
     def dev_dependencies(self) -> Dict[str, str]:
-        # We can add htmx as a dev dependency or dependency if we want to bundle it
-        # But for now the example uses CDN. 
-        # Let's add it to show it works.
-        return {"htmx.org": "^2.0.4"}
+        return {}
 
     def files(self) -> Dict[Path, str]:
         from sastre.scaffold import _EXAMPLE_STYLE
@@ -92,11 +89,11 @@ const currentPage = parseInt(page as string) || 1;
                 hx-vals={`{"page": ${currentPage - 1}}`}
                 hx-swap="outerHTML"
             >
-                Anterior
+                Previous
             </button>
         )}
         
-        <span>Página {currentPage} de {totalPages}</span>
+        <span>Page {currentPage} of {totalPages}</span>
 
         {currentPage < totalPages && (
             <button 
@@ -105,7 +102,7 @@ const currentPage = parseInt(page as string) || 1;
                 hx-vals={`{"page": ${currentPage + 1}}`}
                 hx-swap="outerHTML"
             >
-                Siguiente
+                Next
             </button>
         )}
     </div>
@@ -143,7 +140,7 @@ import Layout from "./Layout.astro";
                     hx-vals='{"page": 1}'
                     hx-swap="outerHTML"
                 >
-                    Cargar Lista con Paginación
+                    Load pagination list
                 </button>
             </div>
         </div>
@@ -160,7 +157,9 @@ import "./style.css";
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title ?? "Sastre"}</title>
-    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <script>
+        import "htmx.org";
+    </script>
 </head>
 <body>
     <slot />

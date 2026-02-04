@@ -158,6 +158,7 @@ class Scaffold:
         
         print("Installing base dependencies...")
         subprocess.run(["pnpm", "install"], cwd=self._path, check=True, shell=True)
+        subprocess.run(["pnpm", "run", "build"], cwd=self._path, check=True, shell=True)
 
     def project(self, skip_pnpm_install: bool = False):
         self.dirs()
