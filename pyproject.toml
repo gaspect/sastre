@@ -1,8 +1,15 @@
 [project]
 name = "sastre"
 version = "0.1.0"
-description = "Add your description here"
+description = "Bridge the gap between Python and Astro: Render Astro components directly from your Python backend."
+readme = "README.md"
+authors = [
+    { name = "Jesus", email = "jesus@example.com" }
+]
+license = { text = "MIT" }
+keywords = ["astro", "renderer", "python", "ssr", "fastapi"]
 requires-python = ">=3.13"
 dependencies = [
+    "python-multipart>=0.0.22",
     "requests>=2.32.5",
 ]
