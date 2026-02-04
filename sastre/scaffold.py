@@ -1,3 +1,4 @@
+import os
 import subprocess
 import json
 from pathlib import Path
@@ -131,20 +132,20 @@ class Scaffold:
             self._path / "public" / "js",
             self._path / "public" / "images"
         ]
-        
+
         for d in dirs:
             d.mkdir(parents=True, exist_ok=True)
 
     def files(self):
         # Base files
         package_json = _ASTRO_BASE_PACKAGE.copy()
-        
+
         files = {
             self._path / "package.json": json.dumps(package_json, indent=2),
             self._path / "astro.config.mjs": ASTRO_CONFIG,
             self._path / "src" / "pages" / "render.astro": _RENDER_PAGE
         }
-        
+
         for file_path, content in files.items():
             file_path.write_text(content, encoding="utf-8")
 
@@ -155,10 +156,10 @@ class Scaffold:
             except (subprocess.CalledProcessError, FileNotFoundError):
                 print("pnpm not found. Attempting to install it globally...")
                 subprocess.run(["npm", "install", "-g", "pnpm"], cwd=self._path, check=True, shell=True)
-        
+
         print("Installing base dependencies...")
         subprocess.run(["pnpm", "install"], cwd=self._path, check=True, shell=True)
-        subprocess.run(["pnpm", "run", "build"], cwd=self._path, check=True, shell=True)
+        os.makedirs(self._path / "dist" / "client", exist_ok=True) # pre-patch for statics mounts
 
     def project(self, skip_pnpm_install: bool = False):
         self.dirs()
